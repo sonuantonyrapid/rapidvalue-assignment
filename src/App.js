@@ -1,24 +1,106 @@
-import logo from './logo.svg';
+import React,{useState,Suspense} from 'react';
+
+import {BrowserRouter,Route,NavLink} from 'react-router-dom';
+
 import './App.css';
 
+const Users = React.lazy(()=>import('./container/Users'));
+const UserAdd = React.lazy(()=>import('./container/UserAdd'));
+
 function App() {
+
+  const userFields = {
+    fields:[
+      { 
+        id:'full_name',
+        lable:'Full Name',
+        fieldType:'input',
+        attributes:{type:'text',id:'full_name'}
+      },
+      { 
+        id:'mob',
+        lable:'Mobile',
+        fieldType:'input',
+        attributes:{type:'number',id:'mob'}
+      },
+      { 
+        id:'mail',
+        lable:'Email',
+        fieldType:'input',
+        attributes:{type:'text',id:'mail'}
+      }
+    ]
+  };
+
+
+  const users = [];
+
+  const [usersState,setUsersState] = useState(users);
+
+  const usersHandeler = (user) => {
+
+    let updateUsersState = [...usersState];
+
+    updateUsersState = updateUsersState.concat(user);
+
+    setUsersState(updateUsersState);
+
+    alert('Added');
+
+  }
+
+
   return (
+    <BrowserRouter>
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
+      <nav>
+            <ul>
+                <li>
+                    <NavLink to="/">
+                        Users
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink to="/add-user">
+                        Add User
+                    </NavLink>
+                </li>
+            </ul>
+        </nav>
+
+      <Route path="/" exact render={
+
+        ()=>{
+
+          return (
+            <Suspense fallback={<h1>Loading...</h1>}>
+            <Users users={usersState}/>
+            </Suspense>
+          );
+
+        }
+
+      } />
+
+    <Route path="/add-user" exact render={
+
+      ()=>{
+
+        return (
+          
+          <Suspense fallback={<h1>Loading...</h1>}>
+            <UserAdd fields={userFields} click={usersHandeler}/>
+          </Suspense>
+
+        );
+
+      }
+
+    } />
+      
     </div>
+    </BrowserRouter>
   );
 }
 
